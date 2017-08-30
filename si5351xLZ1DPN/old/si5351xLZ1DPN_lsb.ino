@@ -54,10 +54,10 @@ int byteRead = 0;    // for serial comunication
 #define pulseHigh(pin) {digitalWrite(pin, HIGH); digitalWrite(pin, LOW); }
 Rotary r = Rotary(2,3); // sets the pins for rotary encoder uses.  Must be interrupt pins.
   
-int_fast32_t rx=14000000; // Starting frequency of VFO freq
+int_fast32_t rx=7000000; // Starting frequency of VFO freq
 int_fast32_t rx2=1;  // temp variable to hold the updated frequency
 int_fast32_t rxofset=0; 
-int_fast32_t rxbfo=11999904;  //BFO osc 11999904  11998800
+int_fast32_t rxbfo=11998005;  //BFO osc 11999904  11998800
 int_fast32_t rxRIT=0;
 
 int RITon=0;
@@ -185,15 +185,15 @@ Wire.begin();
   si5351.output_enable(SI5351_CLK2, 1);
 
   // Set CLK levels
-  si5351.drive_strength(SI5351_CLK0,SI5351_DRIVE_8MA); //you can set this to 2MA, 4MA, 6MA or 8MA
+  si5351.drive_strength(SI5351_CLK0,SI5351_DRIVE_6MA); //you can set this to 2MA, 4MA, 6MA or 8MA
   si5351.drive_strength(SI5351_CLK1,SI5351_DRIVE_2MA); //be careful though - measure into 50ohms
-  si5351.drive_strength(SI5351_CLK2,SI5351_DRIVE_8MA); //
+  si5351.drive_strength(SI5351_CLK2,SI5351_DRIVE_6MA); //
  
   Serial.println("*Enable PLL Output\n");
   // Set CLK0 to output the starting "vfo" frequency as set above by vfo = ?
   // Set CLK0 to USB output rx - bfo +/- offset = vfo frequency	
   // Set CLK0 to LSB output bfo - rx +/- offset = vfo frequency  
-  si5351.set_freq((rx - rxbfo + rxofset)*100L , SI5351_CLK0);
+  si5351.set_freq((rxbfo - rx + rxofset)*100L , SI5351_CLK0);
   // Set CLK1 to output txo frequency
   si5351.set_freq((1000000L), SI5351_CLK1);
   si5351.output_enable(SI5351_CLK1, 0);
@@ -366,7 +366,7 @@ void sendFrequency(double frequency) {
   
   //VFO CLK0
   //	si5351.set_freq(((rx + rxbfo + rxRIT)*100LL), SI5351_CLK1);
-  si5351.set_freq(((rx - rxbfo + rxofset + rxRIT)*100LL), SI5351_CLK0);
+  si5351.set_freq(((rxbfo - rx + rxofset + rxRIT)*100LL), SI5351_CLK0);
 	
 	//BFO Set CLK2 to output bfo frequency
   si5351.set_freq((rxbfo*100LL), SI5351_CLK2);
